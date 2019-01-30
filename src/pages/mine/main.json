@@ -1,0 +1,12 @@
+{
+    "navigationBarTitleText": "个人中心",
+    "navigationBarBackgroundColor": "#1c2438",
+    "usingComponents": {
+        "i-tab-bar": "../../../static/iview/tab-bar/index",
+        "i-tab-bar-item": "../../../static/iview/tab-bar-item/index",
+        "i-card": "../../../static/iview/card/index",
+        "i-row": "../../../static/iview/row/index",
+        "i-col": "../../../static/iview/col/index",
+        "i-icon": "../../../static/iview/icon/index"
+    }
+}

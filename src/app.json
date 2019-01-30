@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/home/main",
+    "pages/message/main",
+    "pages/mine/main",
+    "pages/mineProjects/main",
+    "pages/mineDelivery/main",
+    "pages/mineInfo/main",
+    "pages/pubProject/main"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "borderStyle": "white" ,
+    "backgroundColor": "white",
+    "list": [{
+      "pagePath": "pages/home/main",
+      "text": ""
+    },{
+      "pagePath": "pages/message/main",
+      "text": ""
+    },{
+      "pagePath": "pages/mine/main",
+      "text": ""
+    }]
+  }
+}
