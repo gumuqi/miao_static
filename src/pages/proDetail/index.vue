@@ -98,8 +98,25 @@
       </div>
     </div>
     <div class="comment-input">
-      <div class="f-left textarea" contenteditable="true"></div>
-      <i-badge count="123" overflow-count="100">
+      <i-row class="head" v-if="comInputFocus" >
+          <i-col class="cancel" span="4">
+            <span v-on:click="cancelComment">取消</span>
+          </i-col>
+          <i-col class="title" span="16">
+            评论
+          </i-col>
+          <i-col class="submit" span="4">
+            <span v-on:click="submitComment">确定</span>
+          </i-col>
+      </i-row>
+      <textarea
+        auto-height="true"
+        placeholder="发表评论..."
+        v-bind:class="textareaClass"
+        v-model="commentTxt"
+        v-on:focus="onComInputFocus"
+      />
+      <i-badge v-if="!comInputFocus" v-bind:count="comments.length" overflow-count="100">
         <i-icon class="f-left comment-icon" type="message" size="24"/>
       </i-badge>
     </div>
@@ -126,7 +143,10 @@ export default {
       tenderee: {}, // 招标人、需求方
       deliverList: [],
       comments: [],
-      showWin: false
+      showWin: false,
+      comInputFocus: false, // 评论输入框是否获取到焦点
+      textareaClass: 'f-left',
+      commentTxt: ''
     }
   },
   onShow() {
@@ -341,10 +361,49 @@ export default {
       })
     },
     /**
-     * 评论输入框获取焦点时，弹出评论面板
+     * 评论输入框获取焦点时
      */
     onComInputFocus() {
+      this.comInputFocus = true;
+      this.textareaClass = 'f-left inputing';
       console.log('评论输入框获取焦点时，弹出评论面板');
+    },
+    /**
+     * 取消评论
+     */
+    cancelComment() {
+      this.commentTxt = '';
+      this.textareaClass = 'f-left';
+      setTimeout(() => {
+        this.comInputFocus = false;
+      }, 300);
+    },
+    /**
+     * 提交评论
+     */
+    submitComment() {
+      let id = util.getUrlParam('project_id');
+      let userInfo = wx.getStorageSync('userInfo') || {}; 
+      wx.request({
+        url: process.env.API_BASE_URL + '/comment',
+        method: 'POST',
+        data: {
+          project_id: id,
+          user_id: userInfo.openid,
+          comment_cont: this.commentTxt
+        },
+        header: {
+          'x-csrf-token': cookies.get('csrfToken', '')
+        },
+        success: (res) => {
+          this.cancelComment();
+          // 将刚才评论的放在所有评论最前面
+          this.comments = [res.data].concat(this.comments);
+        },
+        fail: () => {
+          this.delivering = false;
+        }
+      })
     }
   },
   computed: {
@@ -418,6 +477,9 @@ img.avatarUrl {
   font-size: 12px;
   color: #8796a8;
 }
+.comments {
+  margin-bottom: 74px;
+}
 .comments .title {
   margin-bottom: 32px;
   font-size: 14px;
@@ -455,8 +517,22 @@ img.avatarUrl {
   background:#fff;
   box-shadow: -2px 0px 5px rgba(200, 200, 200, 0.5);
 }
+.comment-input .head {
+  margin-bottom: 10px;
+  text-align: center;
+  line-height: 3em;
+  font-size: 12px;
+  color: #666;
+}
+.comment-input .title {
+  font-size: 16px;
+  color: #333;
+}
+.comment-input .submit {
+  color: #5cadff;
+}
 .comment-input textarea {
-  width: 50%;
+  width: 80%;
   height:auto;
   min-height:16px;
   margin-top: 2px;
@@ -464,26 +540,11 @@ img.avatarUrl {
   font-size:12px;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
+  transition: all 0.3s ease-in-out;
 }
-.textarea{
-    width: 400px;
-    min-height: 20px;
-    max-height: 300px;
-    _height: 120px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 3px;
-    outline: 0;
-    border: 1px solid #a0b3d6;
-    font-size: 12px;
-    line-height: 24px;
-    padding: 2px;
-    word-wrap: break-word;
-    overflow-x: hidden;
-    overflow-y: auto;
- 
-    border-color: rgba(82, 168, 236, 0.8);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);
+.comment-input textarea.inputing {
+  width: 96%;
+  min-height: 120px;
 }
 .comment-input .comment-icon {
   margin-left: 20px;
