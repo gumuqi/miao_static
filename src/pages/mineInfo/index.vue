@@ -53,6 +53,9 @@ export default {
     }
   },
   created() {
+    
+  },
+  onShow() {
     this.getUserInfo();
   },
   methods: {
@@ -105,8 +108,8 @@ export default {
           });
           setTimeout(() => {
             wx.switchTab({
-            url: '../mine/main'
-          });
+              url: '../mine/main'
+            });
           }, 2000);
         },
         fail: () => {

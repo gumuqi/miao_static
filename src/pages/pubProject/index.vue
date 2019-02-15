@@ -31,20 +31,42 @@
       <textarea v-model="description" class="i-input-input i-cell-bd" placeholder="请详细描述您的项目需求，以便开发者更好的判断自己是否合适投递该项目"  maxlength="255"/>
     </div>
     <i-button v-on:click="submit" type="primary">发布</i-button>
+    <tab-bar current="pubProject"></tab-bar>
   </div>
 </template>
 
 <script>
-import globalStore from '../../stores/global-store';
 import cookies from 'weapp-cookie';
+import globalStore from '../../stores/global-store';
+import TabBar from '../../components/tabbar/index';
+
 export default {
+  components: {
+    'tab-bar': TabBar
+  },
   data () {
     return {
+      id: null,
       name: '',
       technology: '',
       duration: 1,
       price: 0,
       description: ''
+    }
+  },
+  onShow() {
+    let detail = globalStore.state.curProject;
+    if (detail) {
+      // 编辑
+      this.id = detail.id;
+      this.name = detail.name;
+      this.technology = detail.technology;
+      this.duration = detail.duration;
+      this.price = detail.price;
+      this.description = detail.description;
+      globalStore.state.curProject = null; // 用完了清除掉
+    } else {
+      // 新增
     }
   },
   methods: {
@@ -55,6 +77,7 @@ export default {
         url: process.env.API_BASE_URL + '/saveProject',
         method: 'POST',
         data: {
+          id: this.id,
           name: this.name,
           technology: this.technology,
           duration: this.duration,
@@ -67,7 +90,7 @@ export default {
         },
         success: (res) => {
           wx.navigateTo({
-            url: '../mineProjects/main'
+            url: '../proDetail/main?id=' + res.data.id
           });
         },
         fail: () => {

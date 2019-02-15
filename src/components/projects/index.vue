@@ -1,9 +1,6 @@
 <template>
     <div>
       <div class="item" v-for="(pro, index) in list">
-        <div class="icon-cnt">
-            <img v-bind:src="pro.avatarUrl" />
-        </div>
         <div class="body-cnt">
           <i-row>
             <i-col span="18">
@@ -15,7 +12,6 @@
               <div class="price">
                 ¥ {{ pro.price }}
               </div>
-              
             </i-col>
           </i-row>
           <i-row>
@@ -26,17 +22,22 @@
             </i-col>
           </i-row>
           <i-row>
-            <i-col span="12">
+            <i-col span="18">
               <div class="duration">
-                {{ pro.updateTime }}  <span class="spliter">|</span>  {{ pro.count }} 人投递
+                {{ pro.updateTime }}    <span class="spliter">|</span> 
+                {{ pro.count }} 人投递
+                <span class="status">
+                {{ pro.statusTxt }}
+                </span>
               </div>
             </i-col>
-            <i-col span="12" class="status-cnt">
-              <span class="status">
-                {{ pro.statusTxt }}
-              </span>
+            <i-col span="6">
+              <div class="toDetail" v-on:click="toDetail(pro)">
+                详情
+              </div>
             </i-col>
           </i-row>
+          
         </div>
       </div>
     </div>
@@ -52,7 +53,11 @@ export default {
     }
   },
   methods: {
-
+    toDetail: function(pro) {
+      wx.navigateTo({
+        url: '../../pages/proDetail/main?id=' + pro.id
+      })
+    }
   }
 }
 </script>
@@ -83,9 +88,10 @@ img {
 
 }
 .icon-cnt {
-
+  position: relative;
 }
 .body-cnt {
+  
   flex-grow: 1;
   width:calc(100% - 44px);
   padding-left: 10px;
@@ -95,6 +101,7 @@ img {
   height: 30px;
 }
 .name {
+  padding: 2px 0px;
   color: #525b66;
 }
 .price {
@@ -108,14 +115,17 @@ img {
   font-size: 12px;
   color: #8796a8;
 }
-.status-cnt {
-  text-align: right;
-}
 .status {
+  margin-left: 12px;
   padding: 2px 4px;
   font-size: 12px;
   border: 1px solid #61c279;
   color: #61c279;
+}
+.toDetail {
+  text-align: right;
+  font-size: 12px;
+  color: #8796a8;
 }
 .spliter {
   margin: 0 6px;

@@ -49,10 +49,25 @@ export default {
 .container {
   background: #ccc;
 }
+.clearfix::after {
+  display: block;
+  clear: both;
+  content: '.';
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
 .autocut {
   width: 90%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.hr {
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin: 16px 0;
+  border-bottom: 1px solid #dddee1;
 }
 </style>

@@ -9,14 +9,6 @@
     <div class="commen-tool">
       <i-row>
         <i-col span="6">
-          <navigator url='../pubProject/main' class="common-item">
-            <div class="icon publish">
-              <i-icon type="brush" size="24"/>
-            </div>
-            <div>发布需求</div>
-          </navigator>
-        </i-col>
-        <i-col span="6">
           <navigator url='../mineProjects/main' class="common-item">
             <div class="icon mineproject">
               <i-icon type="activity" size="24"/>
@@ -38,6 +30,14 @@
               <i-icon type="addressbook" size="24"/>
             </div>
             <div>个人信息</div>
+          </navigator>
+        </i-col>
+        <i-col span="6">
+          <navigator url='../message/main' class="common-item">
+            <div class="icon message">
+              <i-icon type="remind" size="24"/>
+            </div>
+            <div>消息通知</div>
           </navigator>
         </i-col>
       </i-row>
@@ -104,16 +104,16 @@ export default {
   border-radius: 16px;
   color: #fff;
 }
-.publish {
+.mineproject {
   background: #9dd1ce;
 }
-.mineproject {
+.minedelivery {
   background: #8ebdd8;
 }
-.minedelivery {
+.mineinfo {
   background: #8ea9d7;
 }
-.mineinfo {
+.message {
   background: #eac87b;
 }
 

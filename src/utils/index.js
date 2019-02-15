@@ -116,5 +116,15 @@ String.prototype.rtrim=function(){
 }
 
 export default {
+  /**
+   * 获取参数
+   */ 
+  getUrlParam(name) {
+    const pages = getCurrentPages();
+    const currentPage = pages[pages.length - 1];
+    const url = currentPage.route;
+    const options = currentPage.options;
 
+    return options[name];
+  }
 }

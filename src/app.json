@@ -6,7 +6,8 @@
     "pages/mineProjects/main",
     "pages/mineDelivery/main",
     "pages/mineInfo/main",
-    "pages/pubProject/main"
+    "pages/pubProject/main",
+    "pages/deliverUsers/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -21,7 +22,7 @@
       "pagePath": "pages/home/main",
       "text": ""
     },{
-      "pagePath": "pages/message/main",
+      "pagePath": "pages/pubProject/main",
       "text": ""
     },{
       "pagePath": "pages/mine/main",
