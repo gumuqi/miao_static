@@ -1,8 +1,0 @@
-{
-    "navigationBarTitleText": "首页",
-    "usingComponents": {
-        "i-modal": "../../../static/iview/modal/index",
-        "i-row": "../../../static/iview/row/index",
-        "i-col": "../../../static/iview/col/index"
-    }
-}

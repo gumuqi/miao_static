@@ -1,8 +1,11 @@
 {
     "navigationBarTitleText": "项目详情",
     "usingComponents": {
+        "i-modal": "../../../static/iview/modal/index",
         "i-row": "../../../static/iview/row/index",
         "i-col": "../../../static/iview/col/index",
-        "i-button": "../../../static/iview/button/index"
+        "i-button": "../../../static/iview/button/index",
+        "i-icon": "../../../static/iview/icon/index",
+        "i-badge": "../../../static/iview/badge/index"
     }
 }

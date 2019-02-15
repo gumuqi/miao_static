@@ -7,7 +7,7 @@
     "pages/mineDelivery/main",
     "pages/mineInfo/main",
     "pages/pubProject/main",
-    "pages/deliverUsers/main"
+    "pages/bidder/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -20,9 +20,6 @@
     "backgroundColor": "white",
     "list": [{
       "pagePath": "pages/home/main",
-      "text": ""
-    },{
-      "pagePath": "pages/pubProject/main",
       "text": ""
     },{
       "pagePath": "pages/mine/main",

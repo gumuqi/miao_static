@@ -8,9 +8,9 @@
           </div>
         </i-col>
         <i-col span="6">
-          <div class="status">
-            {{ detail.statusTxt }}
-          </div>
+          <div v-if="detail.status==0" class="status status0">招募中</div>
+          <div v-if="detail.status==1" class="status status1">开发中</div>
+          <div v-if="detail.status==2" class="status status2">已结束</div>
         </i-col>
       </i-row>
       <i-row>
@@ -18,10 +18,8 @@
           <div class="price_time_count">
             金额 ¥ {{ detail.price }}    <span class="spliter">|</span> 
             发布时间 {{ detail.updateTime }} <span class="spliter">|</span>
-            <span v-if="detail.isMine">
-              <navigator url='../deliverUsers/main' class="link">
-                报名人数 {{ deliverList.length }}
-              </navigator>
+            <span v-if="detail.isMine" v-on:click="toUsers" class="link">
+              报名人数 {{ deliverList.length }}
             </span>
             <span v-else>
               报名人数 {{ deliverList.length }}
@@ -30,19 +28,22 @@
         </i-col>
       </i-row>
       <div class="hr"></div>
-      <div class="box-title">需求方</div>
-      <div class="partAside">
-        <i-row class="name">
-          <i-col span="4">
-            <img class="avatarUrl" v-bind:src="user.avatarUrl" />
-          </i-col>
-          <i-col span="20">
-            <div class="name"> {{ user.nick_name }}</div>
-            <div class="other">发布项目 {{ user.count }} 个</div>
-            <div class="other">入驻时间 {{ user.joinTime }}</div>
-          </i-col>
-        </i-row>
+      <div v-if="detail.winner">
+        <div class="box-title">中标者</div>
+        <div class="partAside">
+          <i-row class="name">
+            <i-col span="4">
+              <img class="avatarUrl" v-bind:src="bidder.avatarUrl" />
+            </i-col>
+            <i-col span="20">
+              <div class="name"> {{ bidder.nick_name }}</div>
+              <div class="other">擅长 {{ bidder.good_at }}</div>
+              <div class="other">入驻时间 {{ bidder.joinTime }}</div>
+            </i-col>
+          </i-row>
+        </div>
       </div>
+
       <div class="box-title">技术要求</div>
       <div class="box-text">
         {{ detail.technology }}
@@ -53,13 +54,29 @@
         {{ detail.description }}
       </div>
 
+      <div class="box-title">需求方</div>
+      <div class="partAside">
+        <i-row class="name">
+          <i-col span="4">
+            <img class="avatarUrl" v-bind:src="tenderee.avatarUrl" />
+          </i-col>
+          <i-col span="20">
+            <div class="name"> {{ tenderee.nick_name }}</div>
+            <div class="other">发布项目 {{ tenderee.count }} 个</div>
+            <div class="other">入驻时间 {{ tenderee.joinTime }}</div>
+          </i-col>
+        </i-row>
+      </div>
+
       <div class="tools clearfix">
         <div v-if="detail.isMine" >
-          <i-button type="primary" class="btn" v-on:click="toEditProject">编辑</i-button>
+          <i-button type="primary" v-if="detail.status==0" v-on:click="toEditProject">编辑</i-button>
+          <i-button type="success" v-if="detail.status==1" v-on:click="endProject">完成</i-button>
+          <i-button v-if="detail.status==2">已结束</i-button>
         </div>
         <div v-else>
-          <i-button type="success" class="btn" v-if="detail.delivered">已投递</i-button>
-          <i-button type="primary" class="btn" v-else v-on:click="deliver" v-bind:loading="delivering">投递</i-button>
+          <i-button type="success" v-if="detail.delivered">已投递</i-button>
+          <i-button type="primary" v-else v-on:click="deliver" v-bind:loading="delivering">投递</i-button>
         </div>
       </div>
       <div class="hr"></div>
@@ -75,8 +92,22 @@
             <div class="time">{{ item.commentTime }}</div>
           </i-col>
         </i-row>
+        <div class="msg" v-if="comments.length==0">
+          暂无评论
+        </div>
       </div>
     </div>
+    <div class="comment-input">
+      <div class="f-left textarea" contenteditable="true"></div>
+      <i-badge count="123" overflow-count="100">
+        <i-icon class="f-left comment-icon" type="message" size="24"/>
+      </i-badge>
+    </div>
+    <i-modal title="结束确认" v-bind:visible="showWin" v-on:ok="endProjectSubmit" v-on:cancel="endProjectCancel">
+      <view class="confirm-msg">
+        请确认项目已完工？
+      </view>
+    </i-modal>
   </div>
 </template>
 
@@ -91,22 +122,23 @@ export default {
       isMine: false,  // 是否是我的项目，如果是，那么具有编辑功能
       delivered: false, // 是否已投递该项目
       detail: {},
-      user: {},
+      bidder: {},   // 投标人、中标者
+      tenderee: {}, // 招标人、需求方
       deliverList: [],
-      comments: []
+      comments: [],
+      showWin: false
     }
   },
   onShow() {
     this.getProjectDetail();
     this.getDelivered();
-    this.getUserDetail();
   },
   methods: {
     /**
      * 获取项目详情
      */
     getProjectDetail: function() {
-      let id = util.getUrlParam('id');
+      let id = util.getUrlParam('project_id');
       let userInfo = wx.getStorageSync('userInfo') || {};
       wx.request({
         url: process.env.API_BASE_URL + '/getProjectDetail',
@@ -117,6 +149,8 @@ export default {
         },
         success: (res) => {
           this.setProject(res.data);
+          this.getTendereeDetail();
+          this.getBidderDetail();
           this.getComments();
         },
         fail: () => {
@@ -125,18 +159,37 @@ export default {
       })
     },
     /**
-     * 获取用户详情
+     * 获取招标人详情
      */
-    getUserDetail: function() {
-      let userInfo = wx.getStorageSync('userInfo') || {};
+    getTendereeDetail: function() {
       wx.request({
         url: process.env.API_BASE_URL + '/getUserInfo',
         method: 'GET',
         data: {
-          user_id: userInfo.openid
+          user_id: this.detail.user_id
         },
         success: (res) => {
-          this.setUser(res.data);
+          this.setTenderee(res.data);
+        },
+        fail: () => {
+
+        }
+      })
+    },
+    /**
+     * 获取中标人信息
+     */
+    getBidderDetail: function() {
+      const winner = this.detail.winner;
+      if (!winner) return; // 如无中标者，无需发起请求
+      wx.request({
+        url: process.env.API_BASE_URL + '/getUserInfo',
+        method: 'GET',
+        data: {
+          user_id: winner
+        },
+        success: (res) => {
+          this.setBidder(res.data);
         },
         fail: () => {
 
@@ -147,7 +200,7 @@ export default {
      * 获取项目的投递情况
      */
     getDelivered: function() {
-      let id = util.getUrlParam('id');
+      let id = util.getUrlParam('project_id');
       wx.request({
         url: process.env.API_BASE_URL + '/getDelivered',
         method: 'GET',
@@ -201,9 +254,13 @@ export default {
     setDelivered(data) {
       this.deliverList = data;
     },
-    setUser(data) {
+    setTenderee(data) {
       data.joinTime = new Date(data.created_at).Format('yyyy-MM-dd');
-      this.user = data;
+      this.tenderee = data;
+    },
+    setBidder(data) {
+      data.joinTime = new Date(data.created_at).Format('yyyy-MM-dd');
+      this.bidder = data;
     },
     setComments(data) {
       data.commentTime = new Date(data.created_at).Format('yyyy-MM-dd');
@@ -215,9 +272,40 @@ export default {
     toEditProject() {
       // 由于切换tab时不能携带参数，所以参与全部变量的方式传递
       globalStore.state.curProject = this.detail;
-      wx.switchTab({
+      wx.navigateTo({
         url: '../pubProject/main'
       });
+    },
+    /**
+     * 结束项目
+     */
+    endProject() {
+      this.showWin = true;
+    },
+    endProjectSubmit() {
+      let id = util.getUrlParam('project_id');
+      wx.request({
+        url: process.env.API_BASE_URL + '/endProject',
+        method: 'POST',
+        data: {
+          project_id: id
+        },
+        header: {
+          'x-csrf-token': cookies.get('csrfToken', '')
+        },
+        success: (res) => {
+          this.showWin = false;
+          wx.switchTab({
+            url: '../home/main'
+          });
+        },
+        fail: () => {
+
+        }
+      })
+    },
+    endProjectCancel() {
+      this.showWin = false;
     },
     /**
      * 投递当前项目
@@ -243,6 +331,20 @@ export default {
           this.delivering = false;
         }
       })
+    },
+    /**
+     * 查看投递该项目的开发者列表
+     */
+    toUsers() {
+      wx.navigateTo({
+        url: '../bidder/main?project_id=' + this.detail.id
+      })
+    },
+    /**
+     * 评论输入框获取焦点时，弹出评论面板
+     */
+    onComInputFocus() {
+      console.log('评论输入框获取焦点时，弹出评论面板');
     }
   },
   computed: {
@@ -272,7 +374,15 @@ img.avatarUrl {
 .base-info .status {
   font-size: 14px;
   text-align: right;
+}
+.base-info .status0 {
   color: #61c279;
+}
+.base-info .status1 {
+  color: #5cadff;
+}
+.base-info .status2 {
+  color: #bbbec4;
 }
 .price_time_count {
   margin-top: 16px;
@@ -290,15 +400,14 @@ img.avatarUrl {
   font-size: 14px;
   color: #666;
 }
-.tools .btn {
-  display: inline-block;
-  float: right;
+.tools{
+  margin-top: 40px;
 }
 
 .partAside {
   padding: 12px;
   border: 1px solid #dddee1;
-  box-shadow: 0 0 5px rgba(100, 100, 100, 0.3);
+  box-shadow: 0 0 5px rgba(200, 200, 200, 0.5);
 }
 .partAside .name {
   font-size: 14px;
@@ -328,5 +437,55 @@ img.avatarUrl {
 .comments .time {
   font-size: 10px;
   color: #888;
+}
+.link {
+  display: inline;
+}
+.msg {
+  font-size: 12px;
+  text-align: center;
+  color: #888;
+}
+.comment-input {
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:8px 16px;
+  background:#fff;
+  box-shadow: -2px 0px 5px rgba(200, 200, 200, 0.5);
+}
+.comment-input textarea {
+  width: 50%;
+  height:auto;
+  min-height:16px;
+  margin-top: 2px;
+  padding: 6px;
+  font-size:12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+.textarea{
+    width: 400px;
+    min-height: 20px;
+    max-height: 300px;
+    _height: 120px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 3px;
+    outline: 0;
+    border: 1px solid #a0b3d6;
+    font-size: 12px;
+    line-height: 24px;
+    padding: 2px;
+    word-wrap: break-word;
+    overflow-x: hidden;
+    overflow-y: auto;
+ 
+    border-color: rgba(82, 168, 236, 0.8);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+.comment-input .comment-icon {
+  margin-left: 20px;
 }
 </style>

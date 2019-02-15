@@ -18,9 +18,15 @@ export default {
   methods: {
     handleChange: function({ target }) {
         this.current = target.key;
-        wx.switchTab({
-            url: "/pages/"+target.key+"/main"
-        })
+        if (this.current == 'pubProject') {
+            wx.navigateTo({
+                url: "/pages/"+target.key+"/main"
+            })
+        } else {
+            wx.switchTab({
+                url: "/pages/"+target.key+"/main"
+            })
+        }
     }
   }
 }

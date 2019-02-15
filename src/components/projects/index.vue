@@ -26,9 +26,9 @@
               <div class="duration">
                 {{ pro.updateTime }}    <span class="spliter">|</span> 
                 {{ pro.count }} 人投递
-                <span class="status">
-                {{ pro.statusTxt }}
-                </span>
+                <span v-if="pro.status==0" class="status status0">招募中</span>
+                <span v-if="pro.status==1" class="status status1">开发中</span>
+                <span v-if="pro.status==2" class="status status2">已结束</span>
               </div>
             </i-col>
             <i-col span="6">
@@ -55,7 +55,7 @@ export default {
   methods: {
     toDetail: function(pro) {
       wx.navigateTo({
-        url: '../../pages/proDetail/main?id=' + pro.id
+        url: '../../pages/proDetail/main?project_id=' + pro.id
       })
     }
   }
@@ -119,8 +119,18 @@ img {
   margin-left: 12px;
   padding: 2px 4px;
   font-size: 12px;
+}
+.status0 {
   border: 1px solid #61c279;
   color: #61c279;
+}
+.status1 {
+  border: 1px solid #5cadff;
+  color: #5cadff;
+}
+.status2 {
+  border: 1px solid #bbbec4;
+  color: #bbbec4;
 }
 .toDetail {
   text-align: right;

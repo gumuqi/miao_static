@@ -31,7 +31,6 @@
       <textarea v-model="description" class="i-input-input i-cell-bd" placeholder="请详细描述您的项目需求，以便开发者更好的判断自己是否合适投递该项目"  maxlength="255"/>
     </div>
     <i-button v-on:click="submit" type="primary">发布</i-button>
-    <tab-bar current="pubProject"></tab-bar>
   </div>
 </template>
 
@@ -42,7 +41,7 @@ import TabBar from '../../components/tabbar/index';
 
 export default {
   components: {
-    'tab-bar': TabBar
+
   },
   data () {
     return {
@@ -89,8 +88,8 @@ export default {
           'x-csrf-token': cookies.get('csrfToken', '')
         },
         success: (res) => {
-          wx.navigateTo({
-            url: '../proDetail/main?id=' + res.data.id
+          wx.switchTab({
+            url: '../home/main'
           });
         },
         fail: () => {

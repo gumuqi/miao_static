@@ -51,21 +51,6 @@ export default {
      */
     setData: function(list) {
       if (list instanceof Array) {
-        list.map(item => {
-          switch(item.status) {
-            case 0:
-              item.statusTxt = '招募中';
-              break;
-            case 1:
-              item.statusTxt = '开发中';
-              break;
-            case 2:
-              item.statusTxt = '已结束';
-              break;
-            default:
-              item.statusTxt = '招募中';
-          }
-        });
         this.projectList = list;
       }
     }
