@@ -40,6 +40,9 @@
           
         </div>
       </div>
+      <div v-if="list.length==0" class="msg">
+        暂无需求
+      </div>
     </div>
 </template>
 
@@ -139,6 +142,12 @@ img {
 }
 .spliter {
   margin: 0 6px;
+}
+.msg {
+  padding:96px 0;
+  text-align:center;
+  font-size:12px;
+  color: #888;
 }
 </style>
 

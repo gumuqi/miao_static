@@ -28,7 +28,12 @@
       <div class="i-cell-hd i-input-title">
         描述
       </div>
-      <textarea v-model="description" class="i-input-input i-cell-bd" placeholder="请详细描述您的项目需求，以便开发者更好的判断自己是否合适投递该项目"  maxlength="255"/>
+      <textarea
+        v-model="description"
+        class="description i-cell-bd"
+        placeholder="请详细描述您的项目需求，以便开发者更好的判断自己是否合适投递该项目"
+        maxlength="255"
+        auto-height="true" />
     </div>
     <i-button v-on:click="submit" type="primary">发布</i-button>
   </div>
@@ -36,8 +41,7 @@
 
 <script>
 import cookies from 'weapp-cookie';
-import globalStore from '../../stores/global-store';
-import TabBar from '../../components/tabbar/index';
+import util from '../../utils/index';
 
 export default {
   components: {
@@ -48,28 +52,55 @@ export default {
       id: null,
       name: '',
       technology: '',
-      duration: 1,
-      price: 0,
+      duration: null,
+      price: null,
       description: ''
     }
   },
   onShow() {
-    let detail = globalStore.state.curProject;
-    if (detail) {
+    let id = util.getUrlParam('project_id');
+    if (id) {
       // 编辑
-      this.id = detail.id;
-      this.name = detail.name;
-      this.technology = detail.technology;
-      this.duration = detail.duration;
-      this.price = detail.price;
-      this.description = detail.description;
-      globalStore.state.curProject = null; // 用完了清除掉
+      this.getProjectDetail(id);
     } else {
       // 新增
+      this.id = null;
+      this.name = '';
+      this.technology = '';
+      this.duration = null;
+      this.price = null;
+      this.description = '';
     }
   },
   methods: {
-    
+    /**
+     * 获取项目详情
+     */
+    getProjectDetail: function(id) {
+      let userInfo = wx.getStorageSync('userInfo') || {};
+      wx.request({
+        url: process.env.API_BASE_URL + '/getProjectDetail',
+        method: 'GET',
+        data: {
+          id: id,
+          user_id: userInfo.openid
+        },
+        success: (res) => {
+          this.setProject(res.data);
+        },
+        fail: () => {
+
+        }
+      })
+    },
+    setProject(data) {
+      this.id = data.id;
+      this.name = data.name;
+      this.technology = data.technology;
+      this.duration = data.duration;
+      this.price = data.price;
+      this.description = data.description;
+    },
     submit: function() {
       var userInfo = wx.getStorageSync('userInfo') || {}; 
       wx.request({
@@ -126,12 +157,11 @@ export default {
   min-width: 65px;
   padding-right: 10px;
 }
-.i-input-input {
+.description {
   flex: 1;
-  line-height: 1.6;
+  line-height: 1.6em;
   padding: 4px 0;
-  min-height: 22px;
-  height:auto;
+  min-height: 120px;
   font-size: 13px;
 }
 

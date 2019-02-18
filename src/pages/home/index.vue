@@ -96,15 +96,19 @@ export default {
      * 过去项目列表
      */
     getProjects: function() {
+      wx.showLoading({
+        title: '加载中...',
+      })
       wx.request({
         url: process.env.API_BASE_URL + '/getProjectList',
         method: 'GET',
         data: {},
         success: (res) => {
+          wx.hideLoading();
           this.setData(res.data);
         },
         fail: () => {
-
+          wx.hideLoading();
         }
       })
     },

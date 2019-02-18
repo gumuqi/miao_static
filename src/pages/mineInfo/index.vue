@@ -30,7 +30,10 @@
       <div class="i-cell-hd i-input-title">
         自我介绍
       </div>
-      <textarea v-model="description" class="i-input-input i-cell-bd" placeholder="请描述您的项目经历，以便项目方可以判断您是否满足项目需求。" maxlength="255"/>
+      <textarea 
+        v-model="description"
+        class="description i-cell-bd" placeholder="请描述您的项目经历，以便项目方可以判断您是否满足项目需求。"
+        maxlength="255"/>
     </div>
     <i-button v-on:click="submit" type="primary">保存</i-button>
     <i-message id="message" />
@@ -71,8 +74,7 @@ export default {
           user_id: userInfo.openid
         },
         success: (res) => {
-          let detail = res.data || [];
-          detail = detail[0];
+          let detail = res.data;
           this.nickName     = detail.nick_name;
           this.good_at      = detail.good_at;
           this.contact_info = detail.contact_info;
@@ -146,12 +148,11 @@ export default {
   min-width: 65px;
   padding-right: 10px;
 }
-.i-input-input {
+.description {
   flex: 1;
   line-height: 1.6;
   padding: 4px 0;
-  min-height: 22px;
-  height:auto;
+  min-height: 120px;
   font-size: 13px;
 }
 

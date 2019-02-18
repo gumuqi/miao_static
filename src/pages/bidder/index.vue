@@ -9,7 +9,7 @@
           <i-col span="20">
             <div class="base-info clearfix">
               <span class="f-left">{{ user.nick_name }}</span>
-              <i-button v-if="!hasWinner" class="f-right" v-on:click="selectUser(user)" type="primary" size="small">选标</i-button>
+              <button v-if="!hasWinner" class="f-right xuanbiao" v-on:click="selectUser(user)">选标</button>
               <span v-else-if="user.isWinner" class="f-right winner">中标者</span>
             </div>
             <div>擅长{{ user.good_at }}</div>
@@ -83,8 +83,11 @@ export default {
       if (winner) {
         this.hasWinner = true;
         winner = data.splice(winnerIndex, 1);
+        this.list = winner.concat(data);
+      } else {
+        this.list = data;
       }
-      this.list = winner.concat(data);
+      
     },
     /**
      * 选取开发合作者
@@ -181,6 +184,11 @@ img.avatarUrl {
 .winner {
   font-size: 18px;
   color: #19be6b;
+}
+.xuanbiao {
+  font-size: 12px;
+  background: #2d8cf0;
+  color: #fff;
 }
 </style>
 

@@ -83,10 +83,10 @@
       <div class="comments">
         <div class="title">全部评论</div>
         <i-row v-for="(item, index) in comments" v-bind:key="index">
-          <i-col span="3">
+          <i-col span="2">
             <img class="avatarUrl" v-bind:src="item.avatarUrl" />
           </i-col>
-          <i-col span="21">
+          <i-col span="22">
             <div class="nick_name"> {{ item.nick_name }}</div>
             <div class="text">{{ item.comment_cont }}</div>
             <div class="time">{{ item.commentTime }}</div>
@@ -97,32 +97,44 @@
         </div>
       </div>
     </div>
-    <div class="comment-input">
-      <i-row class="head" v-if="comInputFocus" >
-          <i-col class="cancel" span="4">
-            <span v-on:click="cancelComment">取消</span>
-          </i-col>
-          <i-col class="title" span="16">
-            评论
-          </i-col>
-          <i-col class="submit" span="4">
-            <span v-on:click="submitComment">确定</span>
-          </i-col>
-      </i-row>
-      <textarea
-        auto-height="true"
-        placeholder="发表评论..."
-        v-bind:class="textareaClass"
-        v-model="commentTxt"
-        v-on:focus="onComInputFocus"
-      />
-      <i-badge v-if="!comInputFocus" v-bind:count="comments.length" overflow-count="100">
-        <i-icon class="f-left comment-icon" type="message" size="24"/>
-      </i-badge>
+    <div v-bind:class="maskClass">
+      <div class="comment-input">
+        <i-row class="head" v-if="comInputFocus" >
+            <i-col class="cancel" span="4">
+              <span v-on:click="cancelComment">取消</span>
+            </i-col>
+            <i-col class="title" span="16">
+              评论
+            </i-col>
+            <i-col class="submit" span="4">
+              <span v-on:click="submitComment">确定</span>
+            </i-col>
+        </i-row>
+        <textarea
+          auto-height="true"
+          placeholder="发表评论..."
+          v-bind:class="textareaClass"
+          v-model="commentTxt"
+          v-on:focus="onComInputFocus"
+        />
+        <i-badge v-if="!comInputFocus" v-bind:count="comments.length" overflow-count="100">
+          <i-icon class="f-left comment-icon" type="message" size="24"/>
+        </i-badge>
+      </div>
     </div>
-    <i-modal title="结束确认" v-bind:visible="showWin" v-on:ok="endProjectSubmit" v-on:cancel="endProjectCancel">
+    <i-modal title="结束确认" v-bind:visible="showWinEnd" v-on:ok="endProjectSubmit" v-on:cancel="showWinEnd=!showWinEnd">
       <view class="confirm-msg">
-        请确认项目已完工？
+        您确认项目已完工了吗？
+      </view>
+    </i-modal>
+    <i-modal title="投递确认" v-bind:visible="showWinDeliver" v-on:ok="deliverProjectSubmit" v-on:cancel="showWinDeliver=!showWinDeliver">
+      <view class="confirm-msg">
+        您确认具备该项目所需技能点吗？
+      </view>
+    </i-modal>
+    <i-modal title="提示" v-bind:visible="showWinUser" v-on:ok="toMineInfo" v-on:cancel="showWinUser=!showWinUser">
+      <view class="confirm-msg">
+        您还未完善个人信息，是否前往个人信息编辑？
       </view>
     </i-modal>
   </div>
@@ -143,9 +155,12 @@ export default {
       tenderee: {}, // 招标人、需求方
       deliverList: [],
       comments: [],
-      showWin: false,
+      showWinEnd: false,  // 是否确认结束项目
+      showWinDeliver: false, // 是否确认投递项目
+      showWinUser: false,  // 是否前往个人信息编辑
       comInputFocus: false, // 评论输入框是否获取到焦点
       textareaClass: 'f-left',
+      maskClass: '',
       commentTxt: ''
     }
   },
@@ -290,17 +305,16 @@ export default {
      * 编辑项目信息
      */
     toEditProject() {
-      // 由于切换tab时不能携带参数，所以参与全部变量的方式传递
-      globalStore.state.curProject = this.detail;
+      let id = util.getUrlParam('project_id');
       wx.navigateTo({
-        url: '../pubProject/main'
+        url: '../pubProject/main?project_id=' + id
       });
     },
     /**
      * 结束项目
      */
     endProject() {
-      this.showWin = true;
+      this.showWinEnd = true;
     },
     endProjectSubmit() {
       let id = util.getUrlParam('project_id');
@@ -314,7 +328,7 @@ export default {
           'x-csrf-token': cookies.get('csrfToken', '')
         },
         success: (res) => {
-          this.showWin = false;
+          this.showWinEnd = false;
           wx.switchTab({
             url: '../home/main'
           });
@@ -325,12 +339,50 @@ export default {
       })
     },
     endProjectCancel() {
-      this.showWin = false;
+      this.showWinEnd = false;
     },
     /**
      * 投递当前项目
+     * 第一步判断当前用户是否完善了个人信息，如果没有，弹出对话框，引导他前往个人信息编辑页
+     * 第二步，弹出确认对话框，让他确认是否具备当前项目所需要的技术要求
      */
     deliver() {
+      let userInfo = wx.getStorageSync('userInfo') || {};
+      wx.request({
+        url: process.env.API_BASE_URL + '/getUserInfo',
+        method: 'GET',
+        data: {
+          user_id: userInfo.openid
+        },
+        success: (res) => {
+          let detail = res.data;
+          if (!detail.good_at || !detail.contact_info || !detail.description) {
+            // 如果没有编辑个人信息，弹窗引导用户去编辑个人信息
+            this.showWinUser = true;
+          } else {
+            // 弹窗让用户确认是否投递
+            this.showWinDeliver = true;
+          }
+        },
+        fail: () => {
+
+        }
+      })
+    },
+    /**
+     * 前往个人信息编辑
+     */
+    toMineInfo() {
+      this.showWinUser = false;
+      wx.navigateTo({
+        url: '../mineInfo/main'
+      })
+    },
+    /**
+     * 执行投递
+     */
+    deliverProjectSubmit() {
+      this.showWinDeliver = false;
       this.delivering = true;
       var userInfo = wx.getStorageSync('userInfo') || {}; 
       wx.request({
@@ -366,6 +418,7 @@ export default {
     onComInputFocus() {
       this.comInputFocus = true;
       this.textareaClass = 'f-left inputing';
+      this.maskClass = 'mask';
       console.log('评论输入框获取焦点时，弹出评论面板');
     },
     /**
@@ -374,6 +427,7 @@ export default {
     cancelComment() {
       this.commentTxt = '';
       this.textareaClass = 'f-left';
+      this.maskClass = '';
       setTimeout(() => {
         this.comInputFocus = false;
       }, 300);
@@ -485,16 +539,18 @@ img.avatarUrl {
   font-size: 14px;
 }
 .comments .avatarUrl {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
+  margin-top: -14px;
 }
 .comments .nick_name {
-  font-size: 12px;
-  color: #666;
+  font-size: 10px;
+  color: #888;
 }
 .comments .text {
   font-size: 14px;
   padding: 12px 0;
+  margin-bottom: 10px;
 }
 .comments .time {
   font-size: 10px;
@@ -508,8 +564,16 @@ img.avatarUrl {
   text-align: center;
   color: #888;
 }
-.comment-input {
+.mask {
   position:fixed;
+  left:0;
+  right:0;
+  top: 0;
+  bottom:0;
+  background:rgba(0, 0, 0, 0.5);
+}
+.comment-input {
+  position: fixed;
   left:0;
   right:0;
   bottom:0;
@@ -517,6 +581,7 @@ img.avatarUrl {
   background:#fff;
   box-shadow: -2px 0px 5px rgba(200, 200, 200, 0.5);
 }
+
 .comment-input .head {
   margin-bottom: 10px;
   text-align: center;
@@ -548,5 +613,8 @@ img.avatarUrl {
 }
 .comment-input .comment-icon {
   margin-left: 20px;
+}
+.confirm-msg {
+  padding: 0 16px;
 }
 </style>
