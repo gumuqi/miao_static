@@ -143,11 +143,6 @@ img {
 .spliter {
   margin: 0 6px;
 }
-.msg {
-  padding:96px 0;
-  text-align:center;
-  font-size:12px;
-  color: #888;
-}
+
 </style>
 

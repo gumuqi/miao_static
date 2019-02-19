@@ -98,27 +98,30 @@
       </div>
     </div>
     <div v-bind:class="maskClass">
-      <div class="comment-input">
+      <div v-bind:class="commentClass">
         <i-row class="head" v-if="comInputFocus" >
             <i-col class="cancel" span="4">
               <span v-on:click="cancelComment">取消</span>
             </i-col>
             <i-col class="title" span="16">
-              评论
+              <span>评论</span>
             </i-col>
             <i-col class="submit" span="4">
               <span v-on:click="submitComment">确定</span>
             </i-col>
         </i-row>
+        <div v-if="comInputFocus" class="hr"></div>
         <textarea
+          fixed="true"
           auto-height="true"
           placeholder="发表评论..."
-          v-bind:class="textareaClass"
+          class="f-left"
+          cursor-spacing="106"
           v-model="commentTxt"
           v-on:focus="onComInputFocus"
         />
         <i-badge v-if="!comInputFocus" v-bind:count="comments.length" overflow-count="100">
-          <i-icon class="f-left comment-icon" type="message" size="24"/>
+          <i-icon class="f-right comment-icon" type="message" size="24"/>
         </i-badge>
       </div>
     </div>
@@ -159,7 +162,7 @@ export default {
       showWinDeliver: false, // 是否确认投递项目
       showWinUser: false,  // 是否前往个人信息编辑
       comInputFocus: false, // 评论输入框是否获取到焦点
-      textareaClass: 'f-left',
+      commentClass: 'comment-input',
       maskClass: '',
       commentTxt: ''
     }
@@ -167,6 +170,9 @@ export default {
   onShow() {
     this.getProjectDetail();
     this.getDelivered();
+  },
+  onUnload() {
+    this.cancelComment();
   },
   methods: {
     /**
@@ -417,7 +423,7 @@ export default {
      */
     onComInputFocus() {
       this.comInputFocus = true;
-      this.textareaClass = 'f-left inputing';
+      this.commentClass = 'comment-input inputing';
       this.maskClass = 'mask';
       console.log('评论输入框获取焦点时，弹出评论面板');
     },
@@ -426,7 +432,7 @@ export default {
      */
     cancelComment() {
       this.commentTxt = '';
-      this.textareaClass = 'f-left';
+      this.commentClass = 'comment-input';
       this.maskClass = '';
       setTimeout(() => {
         this.comInputFocus = false;
@@ -558,6 +564,7 @@ img.avatarUrl {
 }
 .link {
   display: inline;
+  color: #61c279;
 }
 .msg {
   font-size: 12px;
@@ -577,16 +584,16 @@ img.avatarUrl {
   left:0;
   right:0;
   bottom:0;
-  padding:8px 16px;
+  padding: 4px 0px;
   background:#fff;
   box-shadow: -2px 0px 5px rgba(200, 200, 200, 0.5);
 }
-
 .comment-input .head {
   margin-bottom: 10px;
   text-align: center;
   line-height: 3em;
   font-size: 12px;
+  border-bottom: 1px solid #eee;
   color: #666;
 }
 .comment-input .title {
@@ -597,24 +604,34 @@ img.avatarUrl {
   color: #5cadff;
 }
 .comment-input textarea {
-  width: 80%;
-  height:auto;
-  min-height:16px;
+  width: 76%;
+  height: 16px;
   margin-top: 2px;
-  padding: 6px;
-  font-size:12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  margin-left: 4%;
+  padding: 2px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  box-sizing:border-box;
+  background: #efefef;
   transition: all 0.3s ease-in-out;
 }
-.comment-input textarea.inputing {
+.inputing textarea {
   width: 96%;
-  min-height: 120px;
+  height: 120px!important;
+  margin-left: 0;
+  background: #fff;
 }
 .comment-input .comment-icon {
   margin-left: 20px;
 }
 .confirm-msg {
   padding: 0 16px;
+}
+.hr {
+
+  margin:16rpx 0;
+  border-bottom:2rpx solid #eee;
+
 }
 </style>

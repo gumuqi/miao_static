@@ -1,18 +1,28 @@
 <template>
   <div>
-    <i-modal title="微信授权" v-bind:visible="showPowerWin" v-bind:show-ok="false" v-bind:show-cancel="false">
-      <view>
-        <view class="txt-cont">获取您的公开信息（昵称、头像</view>
-        <i-row i-class="actions">
-          <i-col span="12">
-            <button v-on:click="showPowerWin=!showPowerWin">拒绝</button>
-          </i-col>
-          <i-col span="12" i-class="col-class">
-            <button open-type='getUserInfo' lang="zh_CN" v-on:getuserinfo="getPower">允许</button>
-          </i-col>
-        </i-row>
-      </view>
-    </i-modal>
+    <div v-if="showPowerWin" class="modal">
+      <div class="modal-window">
+        <div class="modal-content">
+          <div class="modal-header">
+            微信授权
+          </div>
+          <div class="modal-body">
+            <view class="txt-cont">获取您的公开信息（昵称、头像）</view>
+          </div>
+          <div class="modal-footer">
+            <i-row>
+              <i-col span="12">
+                <button class="btn" v-on:click="showPowerWin=!showPowerWin">拒绝</button>
+              </i-col>
+              <i-col span="12" i-class="col-class">
+                <button class="btn btn-ok" open-type='getUserInfo' lang="zh_CN" v-on:getuserinfo="getPower">允许</button>
+              </i-col>
+            </i-row>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <project-list v-bind:list="projectList"></project-list>
     <tab-bar current="home"></tab-bar>
   </div>
@@ -72,6 +82,7 @@ export default {
      * 保存并返回用户信息
      */
     saveUserInfo: function(data) {
+      console.log('用户信息' + JSON.stringify(data));
       wx.request({
         url: process.env.API_BASE_URL + '/login',
         method: 'POST',
@@ -159,6 +170,67 @@ export default {
   font-size: 12px;
   border: none;
   background: #fff;
+}
+.modal {
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(0,0,0,.7);
+  z-index:1000;
+  display:flex;
+  -webkit-box-align:center;
+  align-items:center;
+  -webkit-box-pack:center;
+  justify-content:center;
+  transition:all .2s ease-in-out;
+}
+.modal-window {
+  width:270px;
+  position:relative;
+}
+.modal-content {
+  border-radius:7px;
+  padding-top:15px;
+  position:relative;
+  background-color:#fff;
+  border:0;
+  background-clip:padding-box;
+  text-align:center;
+  height:100%;
+  overflow:hidden;
+}
+.modal-header {
+  padding:6px 15px 15px;
+  margin:0;
+  font-size:18px;
+  line-height:1;
+  color:#1c2438;
+  text-align:center;
+}
+.modal-body {
+  max-height:100px;
+  margin-bottom:15px;
+  font-size:14px;
+  color:#80848f;
+  height:100%;
+  line-height:1.5;
+  overflow:auto;
+}
+.modal-footer {
+  
+}
+.modal-footer .btn {
+  border: 0;
+  border-radius: 0px;
+  background: #fff;
+  font-size: 14px;
+  height: 44px;
+  line-height: 44px;
+}
+.modal-footer .btn-ok {
+  color:  #2d8cf0;
 }
 </style>
 

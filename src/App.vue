@@ -22,11 +22,15 @@ export default {
               let appId = globalStore.state.appId;
               let appSecret = globalStore.state.appSecret;
               wx.request({  
-                url: 'https://api.weixin.qq.com/sns/jscode2session?appid='+appId+'&secret='+appSecret+'&js_code='+res.code+'&grant_type=authorization_code',  
-                data: {},  
+                url: process.env.API_BASE_URL + '/getOpenId',
+                data: {
+                  appId: globalStore.state.appId,
+                  appSecret: globalStore.state.appSecret,
+                  code: res.code
+                },  
                 method: 'GET',
                 success: function(res){ 
-                  userInfo.openid = res.data.openid;  
+                  userInfo = res.data || {};
                   wx.setStorageSync('userInfo', userInfo); //存储openid
                 }  
               });
@@ -75,5 +79,14 @@ export default {
 }
 .f-right {
   float: right;
+}
+textarea {
+  height: auto;
+}
+.msg {
+  padding:96px 0;
+  text-align:center;
+  font-size:12px;
+  color: #888;
 }
 </style>

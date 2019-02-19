@@ -3,5 +3,6 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_BASE_URL: '"http://127.0.0.1:7001"'
+  API_BASE_URL: '"https://wxgame.dreamrabbit.tech/fy"'
+  //API_BASE_URL: '"http://127.0.0.1:7001"'
 })

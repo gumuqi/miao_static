@@ -21,6 +21,9 @@
       </div>
       <div class="hr"></div>
     </div>
+    <div v-if="list.length==0" class="msg">
+      暂无投递者
+    </div>
     <i-modal title="中标确认" v-bind:visible="showWin" v-on:ok="submit" v-on:cancel="cancel">
       <view class="confirm-msg">
         请确认已联系过此人，且此人满足项目的技术要求？
