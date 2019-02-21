@@ -1,6 +1,6 @@
 {
   "pages": [
-    "pages/home/main",
+    "pages/homepage/main",
     "pages/message/main",
     "pages/mine/main",
     "pages/mineProjects/main",
@@ -12,14 +12,14 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "WeChat",
+    "navigationBarTitleText": "",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
     "borderStyle": "white" ,
     "backgroundColor": "white",
     "list": [{
-      "pagePath": "pages/home/main",
+      "pagePath": "pages/homepage/main",
       "text": ""
     },{
       "pagePath": "pages/mine/main",

@@ -120,7 +120,7 @@ export default {
         },
         success: (res) => {
           wx.switchTab({
-            url: '../home/main'
+            url: '../homepage/main'
           });
         },
         fail: () => {

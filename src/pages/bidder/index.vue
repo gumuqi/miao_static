@@ -117,7 +117,7 @@ export default {
         success: (res) => {
           this.curUser = null;
           wx.switchTab({
-            url: '../home/main'
+            url: '../homepage/main'
           });
         },
         fail: () => {

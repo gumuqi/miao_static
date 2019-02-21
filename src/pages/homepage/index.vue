@@ -22,9 +22,10 @@
         </div>
       </div>
     </div>
-
+  
     <project-list v-bind:list="projectList"></project-list>
-    <tab-bar current="home"></tab-bar>
+  
+    <tab-bar current="homepage"></tab-bar>
   </div>
 </template>
 

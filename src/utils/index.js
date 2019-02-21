@@ -126,5 +126,14 @@ export default {
     const options = currentPage.options;
 
     return options[name];
+  },
+  /**
+   * 控制判断
+   * @param {*} str 
+   */
+  isEmpty(str) {
+    str = str || '';
+    str = str.ltrim().rtrim();
+    return str === '';
   }
 }

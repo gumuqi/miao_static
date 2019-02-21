@@ -100,14 +100,17 @@
     <div v-bind:class="maskClass">
       <div v-bind:class="commentClass">
         <i-row class="head" v-if="comInputFocus" >
-            <i-col class="cancel" span="4">
-              <span v-on:click="cancelComment">取消</span>
+            <i-col class="cancel" span="4" v-on:click="cancelComment">
+              <span>取消</span>
             </i-col>
             <i-col class="title" span="16">
               <span>评论</span>
             </i-col>
-            <i-col class="submit" span="4">
-              <span v-on:click="submitComment">确定</span>
+            <i-col v-if="commentTxt!==''" class="submit" span="4" v-on:click="submitComment">
+              <span>确定</span>
+            </i-col>
+            <i-col v-else span="4">
+              <span>确定</span>
             </i-col>
         </i-row>
         <div v-if="comInputFocus" class="hr"></div>
@@ -119,6 +122,7 @@
           cursor-spacing="106"
           v-model="commentTxt"
           v-on:focus="onComInputFocus"
+          v-bind:change="commentTxtChange"
         />
         <i-badge v-if="!comInputFocus" v-bind:count="comments.length" overflow-count="100">
           <i-icon class="f-right comment-icon" type="message" size="24"/>
@@ -336,7 +340,7 @@ export default {
         success: (res) => {
           this.showWinEnd = false;
           wx.switchTab({
-            url: '../home/main'
+            url: '../homepage/main'
           });
         },
         fail: () => {
@@ -426,6 +430,12 @@ export default {
       this.commentClass = 'comment-input inputing';
       this.maskClass = 'mask';
       console.log('评论输入框获取焦点时，弹出评论面板');
+    },
+    /**
+     * 监听评论文案变动
+     */
+    commentTxtChange() {
+      this.commentTxt = this.commentTxt.ltrim().rtrim();
     },
     /**
      * 取消评论

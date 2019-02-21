@@ -1,5 +1,5 @@
 {
-    "navigationBarTitleText": "个人中心",
+    "navigationBarTitleText": "",
     "navigationBarBackgroundColor": "#1c2438",
     "usingComponents": {
         "i-tab-bar": "../../../static/iview/tab-bar/index",
